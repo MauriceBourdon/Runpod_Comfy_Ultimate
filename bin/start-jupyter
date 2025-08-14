@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec /venv/bin/jupyter lab \
+  --ServerApp.ip=0.0.0.0 \
+  --ServerApp.port="${JUPYTER_PORT:-8888}" \
+  --ServerApp.open_browser=False \
+  --ServerApp.token="${JUPYTER_TOKEN:-}" \
+  --ServerApp.password='' \
+  --ServerApp.allow_origin='*' \
+  --ServerApp.root_dir="${JUPYTER_DIR:-/workspace}" \
+  --ServerApp.allow_root=True

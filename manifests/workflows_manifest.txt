@@ -1,0 +1,2 @@
+https://raw.githubusercontent.com/kijai/ComfyUI-WanVideoWrapper/main/example_workflows/Wan2.2_Text2Video_basic.json
+https://raw.githubusercontent.com/kijai/ComfyUI-WanVideoWrapper/main/example_workflows/Wan2.2_I2V_basic.json

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec /venv/bin/python "${COMFY_DIR:-/opt/ComfyUI}"/main.py ${COMFY_ARGS:-"--listen 0.0.0.0 --port 8188"}
