@@ -1,4 +1,0 @@
-# include Wan2.2
-* include: models_wan22.txt
-# include FastWan
-* include: models_fastwan.txt

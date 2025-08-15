@@ -1,4 +1,0 @@
-Kijai/WanVideo_comfy|Wan2_2-I2V-A14B-HIGH_bf16.safetensors|diffusion_models/wan
-Kijai/WanVideo_comfy|Wan2_2-I2V-A14B-LOW_bf16.safetensors|diffusion_models/wan
-Kijai/WanVideo_comfy|Wan2_2_VAE_bf16.safetensors|vae
-Kijai/WanVideo_comfy|umt5-xxl-enc-bf16.safetensors|clip
