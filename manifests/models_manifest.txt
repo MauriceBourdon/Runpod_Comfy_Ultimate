@@ -1,7 +1,20 @@
-# Modèles Wan 2.2 — manifest par défaut (copié vers /workspace au 1er démarrage)
+# Manifest modèles — éditable dans /workspace/models_manifest.txt
+# Format: repo_hf|chemin_fichier_dans_repo|sous_dossier_relatif_dans_/workspace/models
+
+# Wan 2.2 de base
 Kijai/WanVideo_comfy|Wan2_2_VAE_bf16.safetensors|vae
 Kijai/WanVideo_comfy|umt5-xxl-enc-bf16.safetensors|clip
 
-# FastWan optionnel
+# Wan 2.2 FastWan (diffusion + LoRA)
 Kijai/WanVideo_comfy|FastWan/Wan2_2-TI2V-5B-FastWanFullAttn_bf16.safetensors|diffusion_models/wan
-Kijai/WanVideo_comfy|Wan2_2_5B_FastWanFullAttn_lora_rank_128_bf16.safetensors|loras/wan
+Kijai/WanVideo_comfy|FastWan/Wan2_2_5B_FastWanFullAttn_lora_rank_128_bf16.safetensors|loras/wan
+
+# Comfy-Org LoRAs Wan 2.2 (I2V LightX2V 4 steps)
+Comfy-Org/Wan_2.2_ComfyUI_Repackaged|split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors|loras/wan
+Comfy-Org/Wan_2.2_ComfyUI_Repackaged|split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors|loras/wan
+
+# Exemples Fun Control (désactivés par défaut, retire le # pour activer)
+# Kijai/WanVideo_comfy_fp8_scaled|Fun/Wan2_2-Fun-Control-A14B-HIGH_fp8_e4m3fn_scaled_KJ_fixed.safetensors|diffusion_models/wan
+# Kijai/WanVideo_comfy_fp8_scaled|Fun/Wan2_2-Fun-Control-A14B-HIGH_fp8_e5m2_scaled_KJ_fixed.safetensors|diffusion_models/wan
+# Kijai/WanVideo_comfy_fp8_scaled|Fun/Wan2_2-Fun-Control-A14B-LOW_fp8_e4m3fn_scaled_KJ_fixed.safetensors|diffusion_models/wan
+# Kijai/WanVideo_comfy_fp8_scaled|Fun/Wan2_2-Fun-Control-A14B-LOW_fp8_e5m2_scaled_KJ_fixed.safetensors|diffusion_models/wan

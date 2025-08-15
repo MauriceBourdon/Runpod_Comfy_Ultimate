@@ -13,7 +13,7 @@ MODELS_MANIFEST="${MODELS_MANIFEST:-/workspace/models_manifest.txt}"
 mkdir -p "${DATA_DIR}" "${MODELS_DIR}"/{diffusion_models,vae,loras,clip,controlnet}
 mkdir -p "${COMFY_DIR}/user/default/workflows" "${COMFY_DIR}/input" "${COMFY_DIR}/output"
 
-# v4.1.3-compatible extra_model_paths.yaml
+# extra_model_paths.yaml
 cat >"${COMFY_DIR}/extra_model_paths.yaml" <<'YAML'
 models:
   diffusion_models: /workspace/models/diffusion_models

@@ -27,7 +27,7 @@ def main():
             try:
                 fp = hf_hub_download(repo_id=repo, filename=rel,
                                      token=(args.token or None),
-                                     local_dir=dstdir, local_dir_use_symlinks=False)
+                                     local_dir=dstdir)
                 ok += 1
                 print(f"ok: {repo} {rel} -> {fp}")
             except Exception as e:
