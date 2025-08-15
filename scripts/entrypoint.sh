@@ -23,13 +23,21 @@ models:
   controlnet: /workspace/models/controlnet
 YAML
 
-# Symlinks in /workspace (no nested ComfyUI/ComfyUI)
-ln -sfnT "${COMFY_DIR}" "${DATA_DIR}/ComfyUI"
-ln -sfnT "${COMFY_DIR}/user/default/workflows" "${DATA_DIR}/workflows"
-ln -sfnT "${COMFY_DIR}/input" "${DATA_DIR}/input"
-ln -sfnT "${COMFY_DIR}/output" "${DATA_DIR}/output"
+# robust symlink creator (backs up existing dirs)
+safe_link() {
+  local link="$1" target="$2"
+  if [ -e "$link" ] && [ ! -L "$link" ]; then
+    mv "$link" "${link}.bak.$(date +%s)"
+  fi
+  ln -sfnT "$target" "$link"
+}
 
-# If no user manifest present, seed it from /manifests (once)
+safe_link "${DATA_DIR}/ComfyUI"   "${COMFY_DIR}"
+safe_link "${DATA_DIR}/workflows" "${COMFY_DIR}/user/default/workflows"
+safe_link "${DATA_DIR}/input"     "${COMFY_DIR}/input"
+safe_link "${DATA_DIR}/output"    "${COMFY_DIR}/output"
+
+# Seed manifest into /workspace if missing
 if [[ ! -f "${MODELS_MANIFEST}" && -f "/manifests/models_manifest.txt" ]]; then
   cp -n "/manifests/models_manifest.txt" "${MODELS_MANIFEST}"
 fi

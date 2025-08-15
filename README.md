@@ -1,10 +1,11 @@
-# ComfyUI cu12.8 — Symlink + External Model Manifest
+# ComfyUI cu12.8 — Symlink + External Model Manifest (v3)
 
 - CUDA 12.8 + **torch cu128** préinstallé
 - ComfyUI + ComfyUI-Manager
 - JupyterLab (8888) optionnel
-- **Symlinks** pratiques dans `/workspace`: `ComfyUI`, `workflows`, `input`, `output`
-- **Manifest modèles éditable** dans `/workspace/models_manifest.txt` + commande `pull-models`
+- Symlinks robustes (`safe_link`) vers `/workspace/{ComfyUI,workflows,input,output}`
+- Manifest modèles éditable dans `/workspace/models_manifest.txt`
+- Commande `pull-models` (async/sync/status/watch)
 
 ## Variables RunPod
 ```
@@ -26,14 +27,9 @@ PIP_NO_CACHE_DIR=0
 # HF_TOKEN=... (si besoin)
 ```
 
-## Éditer la liste de modèles
-- Ouvre `/workspace/models_manifest.txt` dans JupyterLab, modifie, puis:
-  - `pull-models` (async) ou `pull-models --sync` (bloquant)
-  - Log: `/workspace/models_download.log`
+## Utilisation
+- Édite `/workspace/models_manifest.txt` puis:
+  - `pull-models` (async) ou `pull-models --sync`
+  - `pull-models --status` pour voir le log
 
-Format d'une ligne du manifest: `repo|fichier|sous_dossier`
-```
-Kijai/WanVideo_comfy|Wan2_2_VAE_bf16.safetensors|vae
-```
-
-Bonne session !
+Log: `/workspace/models_download.log`
