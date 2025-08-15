@@ -1,0 +1,69 @@
+\
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+pull-models  —  lance le téléchargement des modèles depuis le manifest
+
+Usage:
+  pull-models [--sync] [--status] [--watch] [--manifest <fichier>] [--out <dir>]
+
+Options:
+  --sync                 Télécharge en mode synchrone (bloquant)
+  --status               Affiche les dernières lignes du log
+  --watch                Surveille le manifest et relance dès qu'il change (nécessite inotify-tools)
+  --manifest <fichier>   Manifest à utiliser (défaut: $MODELS_MANIFEST ou /workspace/models_manifest.txt)
+  --out <dir>            Répertoire d'installation (défaut: $MODELS_DIR ou /workspace/models)
+  -h, --help             Cette aide
+USAGE
+}
+
+MODE="async"
+MANUAL_MF=""
+MANUAL_OUT=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --sync)   MODE="sync"; shift;;
+    --status) MODE="status"; shift;;
+    --watch)  MODE="watch"; shift;;
+    --manifest) MANUAL_MF="${2:-}"; shift 2;;
+    --out)      MANUAL_OUT="${2:-}"; shift 2;;
+    -h|--help) usage; exit 0;;
+    *) echo "Arg inconnu: $1"; usage; exit 2;;
+  esac
+done
+
+MF="${MANUAL_MF:-${MODELS_MANIFEST:-/workspace/models_manifest.txt}}"
+ROOT="${MANUAL_OUT:-${MODELS_DIR:-/workspace/models}}"
+DATA_DIR="${DATA_DIR:-/workspace}"
+LOG="${DATA_DIR}/models_download.log"
+
+mkdir -p "$ROOT"
+
+case "$MODE" in
+  status)
+    test -f "$LOG" && tail -n 120 "$LOG" || echo "Aucun log trouvé: $LOG"
+    ;;
+  sync)
+    echo "[pull-models] Téléchargement synchrone: $MF -> $ROOT"
+    python /scripts/download_models_worker.py --manifest "$MF" --out "$ROOT" | tee -a "$LOG"
+    ;;
+  watch)
+    if ! command -v inotifywait >/dev/null 2>&1; then
+      echo "[pull-models] inotify-tools manquant. Installe: apt-get update && apt-get install -y inotify-tools"
+      exit 1
+    fi
+    echo "[pull-models] Watch sur: $MF — relance async à chaque modif…"
+    while inotifywait -e close_write,move,create,delete "$MF"; do
+      nohup bash /scripts/download_models_async.sh "$MF" "$ROOT" >> "$LOG" 2>&1 &
+      echo "[pull-models] Relance async PID=$! — log: $LOG"
+    done
+    ;;
+  async|*)
+    echo "[pull-models] Téléchargement asynchrone: $MF -> $ROOT"
+    nohup bash /scripts/download_models_async.sh "$MF" "$ROOT" >> "$LOG" 2>&1 &
+    echo "[pull-models] Démarré (PID $!) — suis avec: tail -f $LOG"
+    ;;
+esac
