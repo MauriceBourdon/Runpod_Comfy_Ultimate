@@ -1,49 +1,41 @@
+\
 #!/usr/bin/env bash
 set -euo pipefail
 
 export PATH="/venv/bin:$PATH"
-mkdir -p "${DATA_DIR:-/workspace}" "${MODELS_DIR:-/workspace/models}" "${PIP_CACHE_DIR:-/workspace/.pip-cache}"
 
-if ! python -c "import torch" >/dev/null 2>&1; then
-  if ! pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cu128 torch torchvision torchaudio; then
-    pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchvision torchaudio
-  fi
-fi
+mkdir -p "${DATA_DIR:-/workspace}" "${MODELS_DIR:-/workspace/models}" "${PIP_CACHE_DIR:-/workspace/.pip-cache}" \
+         "${COMFY_DIR:-/opt/ComfyUI}/user/default/workflows"
 
-python - <<'PY' || pip install --no-cache-dir huggingface-hub==0.24.6 safetensors==0.4.5
-import importlib; importlib.import_module("huggingface_hub"); importlib.import_module("safetensors")
-PY
-
+# Generate extra_model_paths.yaml (multi-line scalars)
 cat >"${COMFY_DIR:-/opt/ComfyUI}/extra_model_paths.yaml" <<'YAML'
-models_dir: |
-  /workspace/models
-  /opt/ComfyUI/models
-custom_nodes: |
-  /opt/ComfyUI/custom_nodes
-  /workspace/custom_nodes
-user_dir: |
-  /workspace/ComfyUI/user
-clip: |
-  /workspace/models/clip
-  /opt/ComfyUI/models/clip
-vae: |
-  /workspace/models/vae
-  /opt/ComfyUI/models/vae
-loras: |
-  /workspace/models/loras
-  /opt/ComfyUI/models/loras
-checkpoints: |
+checkpoint: |
   /workspace/models/diffusion_models
-  /opt/ComfyUI/models/diffusion_models
+  /opt/ComfyUI/models/checkpoints
+
 diffusion_models: |
   /workspace/models/diffusion_models
   /opt/ComfyUI/models/diffusion_models
+
+lora: |
+  /workspace/models/loras
+  /opt/ComfyUI/models/loras
+
+vae: |
+  /workspace/models/vae
+  /opt/ComfyUI/models/vae
+
+clip: |
+  /workspace/models/clip
+  /opt/ComfyUI/models/clip
 YAML
 
+# Start Jupyter (optional)
 if [[ "${ENABLE_JUPYTER:-true}" == "true" ]]; then
-  nohup start-jupyter > /workspace/jupyter.log 2>&1 &
+  nohup /usr/local/bin/start-jupyter > /workspace/jupyter.log 2>&1 &
 fi
 
+# Async download models from manifest (HF public or private via HF_TOKEN)
 if [[ -f "${MODELS_MANIFEST:-}" ]]; then
   nohup python - <<'PY' "${MODELS_MANIFEST}" "${MODELS_DIR:-/workspace/models}" "${HF_TOKEN:-}" > /workspace/models_download.log 2>&1 &
 import sys, os
@@ -53,8 +45,9 @@ os.makedirs(root, exist_ok=True)
 for line in open(mf, "r", encoding="utf-8"):
     line=line.strip()
     if not line or line.startswith("#"): continue
-    try: repo, rel, sub = line.split("|", 3)
-    except ValueError: 
+    try:
+        repo, rel, sub = line.split("|", 3)
+    except ValueError:
         print("skip:", line); continue
     dstdir = os.path.join(root, sub); os.makedirs(dstdir, exist_ok=True)
     try:
@@ -65,4 +58,5 @@ for line in open(mf, "r", encoding="utf-8"):
 PY
 fi
 
-exec start-comfyui
+# Launch ComfyUI
+exec /usr/local/bin/start-comfyui
